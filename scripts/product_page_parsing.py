@@ -1,4 +1,6 @@
 import requests
+import os
+import wget 
 
 from bs4 import BeautifulSoup
 
@@ -20,6 +22,20 @@ def product_parsing(product_page_url):
 
     title = product.findChild("h1").text.strip()
     image_url = "https://books.toscrape.com/" + (product.find('div', {'class': 'item active'}).findChild('img', recursive=False)['src'][4:])
+
+    # RETREAVING IMAGE --------------------------------------------------------------------
+    path = (f"media/{category.upper().replace(' ', '_')}/")
+    directory_exists = os.path.exists(path)
+    if not directory_exists:
+        os.makedirs(path)
+
+    print("IMAGE: downloading image...")
+    image_path = path + category.upper().replace(' ', '_') + "_" + title.lower().replace(' ', '_')
+    file_exists = os.path.exists(image_path)
+    if file_exists:
+        os.remove(image_path)
+    wget.download(image_url, out = (image_path))
+    #-------------
 
     try:
         product_description = product.findChild('p', recursive=False).text
