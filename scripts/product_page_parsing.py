@@ -8,7 +8,7 @@ def product_parsing(product_page_url):
     #--------------------------------- GET PAGE -------------------------------------------
     response = requests.get(product_page_url)
     if response.status_code != 200:
-        print('Could not fetch the page')
+        print('\nERROR: Could not fetch product page')
         exit(1)
 
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -29,8 +29,13 @@ def product_parsing(product_page_url):
     if not directory_exists:
         os.makedirs(path)
 
-    print("IMAGE: downloading image...")
-    image_path = path + category.upper().replace(' ', '_') + "_" + title.lower().replace(' ', '_')
+    print(f"\nIMAGE: downloading image for book {title}...")
+    for ch in ['\\','`','*','/','{','}','[',']','(',')','>','#','+','-','.','!','?','$','\'',',',' ','!',':']:
+        if ch in title:
+            title = title.lower().replace(ch, '_')
+    
+    image_path = path + category.upper().replace(' ', '_') + "_" + title
+    # print(f"My image path is: {image_path}")
     file_exists = os.path.exists(image_path)
     if file_exists:
         os.remove(image_path)

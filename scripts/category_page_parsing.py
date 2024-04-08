@@ -3,7 +3,7 @@ import csv
 import os
 
 from bs4 import BeautifulSoup
-from product_page_parsing import product_parsing
+from scripts.product_page_parsing import product_parsing
 
 def next_page(soup):
     next = soup.find('li', {'class': 'next'})
@@ -18,7 +18,7 @@ def category_parsing(category_page_url, is_next):
     #--------------------------------- GET PAGE -------------------------------------------
     response = requests.get(category_page_url)
     if response.status_code != 200:
-        print('Could not fetch the page')
+        print('\nERROR: Could not fetch category page')
         exit(1)
     #--------------------------------------------------------------------------------------
 
@@ -32,13 +32,6 @@ def category_parsing(category_page_url, is_next):
     for pod in pods:
         links = pod.find_all('a', href=True)[0]
         urls_array.append(links['href'])
-    #--------------------------------------------------------------------------------------
-
-
-    #------------------------- CHECK FOR DIRECTORY -----------------------------------------
-    is_exist = os.path.exists("csv/")
-    if not is_exist:
-        os.makedirs("csv/")
     #--------------------------------------------------------------------------------------
 
 
