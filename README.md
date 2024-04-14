@@ -3,8 +3,9 @@
 This app is a scraper of the website https://books.toscrape.com/
 
 
-It allows you to get informations from books listed in different categories. It will produce one csv per book categories and list all books from that categories in it. 
+It allows you to get informations from books listed in different categories. It will produce one csv per book categories and list all books from that categories in it. It will also retrieve each image from each book.
 
+The code will create two folders : one folder "csv" were it will store all csv created and one folder "media" were it will store all downloaded images.
 
 The header of the csv is as follow : 
 
@@ -22,7 +23,7 @@ The header of the csv is as follow :
 
 ## Launching the app:
 
-- First create a virutal environment.
+- First create a virtual environment.
 - Install the depedencies using requirements.txt
 - Run the app inside your virtual env with the command `python main.py`
 

@@ -4,7 +4,7 @@ import wget
 
 from bs4 import BeautifulSoup
 
-def product_parsing(product_page_url):
+def product_parsing(website, product_page_url):
     #--------------------------------- GET PAGE -------------------------------------------
     response = requests.get(product_page_url)
     if response.status_code != 200:
@@ -21,7 +21,8 @@ def product_parsing(product_page_url):
     product = soup.find('article', {'class': 'product_page'})
 
     title = product.findChild("h1").text.strip()
-    image_url = "https://books.toscrape.com/" + (product.find('div', {'class': 'item active'}).findChild('img', recursive=False)['src'][4:])
+    image_url = website + (product.find('div', {'class': 'item active'}).findChild('img', recursive=False)['src'][6:])
+    image_extension = os.path.splitext(image_url)[1]
 
     # RETREAVING IMAGE --------------------------------------------------------------------
     path = (f"media/{category.upper().replace(' ', '_')}/")
@@ -35,11 +36,10 @@ def product_parsing(product_page_url):
             title = title.lower().replace(ch, '_')
     
     image_path = path + category.upper().replace(' ', '_') + "_" + title
-    # print(f"My image path is: {image_path}")
     file_exists = os.path.exists(image_path)
     if file_exists:
         os.remove(image_path)
-    wget.download(image_url, out = (image_path))
+    wget.download(image_url, out = (image_path + image_extension))
     #-------------
 
     try:

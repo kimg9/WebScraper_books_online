@@ -5,25 +5,14 @@ import os
 from bs4 import BeautifulSoup
 from scripts.product_page_parsing import product_parsing
 
-def next_page(soup):
-    next = soup.find('li', {'class': 'next'})
-    if next:
-        next_page = next.find('a', href=True)
-        next_url = next_page['href']
-        return next_url
-    else:
-        return False
-
-def category_parsing(category_page_url, is_next):
-    #--------------------------------- GET PAGE -------------------------------------------
+def get_content(category_page_url):
     response = requests.get(category_page_url)
     if response.status_code != 200:
         print('\nERROR: Could not fetch category page')
         exit(1)
-    #--------------------------------------------------------------------------------------
+    return response
 
-
-    #----------------------------- GET PRODUCT PAGES URLS ---------------------------------
+def get_urls(response):
     soup = BeautifulSoup(response.content, 'html.parser')
 
     urls_array = []
@@ -32,33 +21,48 @@ def category_parsing(category_page_url, is_next):
     for pod in pods:
         links = pod.find_all('a', href=True)[0]
         urls_array.append(links['href'])
-    #--------------------------------------------------------------------------------------
 
+    return soup, urls_array
+
+def next_page(soup):
+    next = soup.find('li', {'class': 'next'})
+    if next:
+        next_page = next.find('a', href=True)
+        next_url = next_page['href']
+        return next_url
+
+def category_parsing(website, category_page_url):
+    #--------------------------------- GET PAGE -------------------------------------------
+    response = get_content(category_page_url)
+    soup, urls_array = get_urls(response)
+    #--------------------------------------------------------------------------------------
 
     #----------------------------- WRITE CSV ----------------------------------------------
     category = soup.find('h1').text
     header = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
+    books_arrays = []
 
-    # CASE 2: is a following page ------------------------------------------------------------
-    if is_next:
-        with open(f'./csv/{category}_products.csv', 'a') as file:
-            writer = csv.writer(file)
+    with open(f'./csv/{category}_products.csv', 'w+') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        for url in urls_array:
+            product_page_url = website + "catalogue" + url[8:]
+            first_page_data = product_parsing(website, product_page_url)
+            books_arrays.append(first_page_data)
+
+        next = next_page(soup)
+        while next:
+            suffix = "index.html"
+            print("\nCONTINUE: continuing onto next page...")
+            response = get_content(category_page_url.removesuffix(suffix) + next)
+            soup, urls_array = get_urls(response)
             for url in urls_array:
-                product_page_url = "https://books.toscrape.com/catalogue" + url[8:]
-                data = product_parsing(product_page_url)
-                writer.writerow(data)
-        file.close()
-        return(next_page(soup))
-    else:
-    # CASE 1: is a first page --------------------------------------------------------------
-        with open(f'./csv/{category}_products.csv', 'w+') as file:
-            writer = csv.writer(file)
-            writer.writerow(header)
-            for url in urls_array:
-                product_page_url = "https://books.toscrape.com/catalogue" + url[8:]
-                data = product_parsing(product_page_url)
-                writer.writerow(data)
-        file.close()
-        return(next_page(soup))
+                product_page_url = website + "catalogue" + url[8:]
+                page_data = product_parsing(website, product_page_url)
+                books_arrays.append(page_data)
+            next = next_page(soup)
+
+        for array in books_arrays:
+            writer.writerow(array)
     #---------------------------------------------------------------------------------------
     
