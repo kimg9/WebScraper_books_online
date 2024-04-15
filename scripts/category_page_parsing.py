@@ -45,15 +45,9 @@ def category_parsing(website, category_page_url):
     with open(f'./csv/{category}_products.csv', 'w+') as file:
         writer = csv.writer(file)
         writer.writerow(header)
-        for url in urls_array:
-            product_page_url = website + "catalogue" + url[8:]
-            first_page_data = product_parsing(website, product_page_url)
-            books_arrays.append(first_page_data)
-
-        next = next_page(soup)
+        next = "index.html"
         while next:
             suffix = "index.html"
-            print("\nCONTINUE: continuing onto next page...")
             response = get_content(category_page_url.removesuffix(suffix) + next)
             soup, urls_array = get_urls(response)
             for url in urls_array:
@@ -61,6 +55,9 @@ def category_parsing(website, category_page_url):
                 page_data = product_parsing(website, product_page_url)
                 books_arrays.append(page_data)
             next = next_page(soup)
+            if next:
+                print("\nCONTINUE: continuing onto next page...")
+
 
         for array in books_arrays:
             writer.writerow(array)
