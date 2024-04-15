@@ -24,9 +24,9 @@ The header of the csv is as follow :
 ## Launching the app:
 
 - First create a virtual environment.
-- Install the depedencies using requirements.txt
+- Install the depedencies using requirements.txt with command `pip install -r requirements.txt`
 - Run the app inside your virtual env with the command `python main.py`
-
+- The code will create a directory called "csv" and another one called "media" where it will download respectively csv files and image files.
 
 ## List of dependencies :
 - beautifulsoup4==4.12.3
