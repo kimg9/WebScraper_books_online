@@ -41,8 +41,9 @@ def category_parsing(website, category_page_url):
     category = soup.find('h1').text
     header = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax', 'price_excluding_tax', 'number_available', 'product_description', 'category', 'review_rating', 'image_url']
     books_arrays = []
+    category_name = category.upper().replace(' ', '_')
 
-    with open(f'./csv/{category}_products.csv', 'w+') as file:
+    with open(f'./csv/{category_name}.csv', 'w+') as file:
         writer = csv.writer(file)
         writer.writerow(header)
         next = "index.html"
@@ -56,7 +57,7 @@ def category_parsing(website, category_page_url):
                 books_arrays.append(page_data)
             next = next_page(soup)
             if next:
-                print("\nCONTINUE: continuing onto next page...")
+                print("\n\nCONTINUE: continuing onto next page...")
 
 
         for array in books_arrays:
